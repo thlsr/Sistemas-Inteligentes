@@ -15,76 +15,80 @@
 # 14. 	Crise bancaria (1 ou 0)
 
 
+
 import csv
-import pybrain
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.structure import SigmoidLayer
 
 
-with open('teste1.csv', 'rt') as csvfile:
-    data = csv.reader(csvfile)
+with open('base.csv', 'rt') as csvbase:
+    base = csv.reader(csvbase)
     linha = 0
-    matrixDados = [[0] * 10 for i in range(1007)]
+    matrixDados = [[0] * 9 for i in range(1007)]
     matrixCriseBanc = [[0] for i in range(1007)]
-    for row in data:
-        #print row[9]
+    for row1 in base:
         for i in range(9):
-            matrixDados[linha][i] = float(row[i])
-        matrixCriseBanc[linha] = float(row[9])
+            matrixDados[linha][i] = float(row1[i])
+        matrixCriseBanc[linha] = float(row1[9])
 
         linha = linha +1
 
-csvfile.close()
+    csvbase.close()
+
+with open('resultados.csv', 'rt') as csvteste:
+    teste = csv.reader(csvteste)
+    l = 0
+    matrixTesteInput = [[0] * 9 for i in range(52)]
+    matrixTesteOutput = [[0] for i in range(52)]
+    for row2 in teste:
+        for i in range(9):
+            matrixTesteInput[l][i] = float(row2[i])
+        matrixTesteOutput[l] = float(row2[9])
+
+        l = l+1
+    csvteste.close()
+
 
 ds = SupervisedDataSet(9, 1)
 
-# print(matrixDados)
-# print(matrixCriseBanc)
-
-#acrescenta os dados de treino
+# acrescenta os dados de treino
 for j in range(1007):
     ds.addSample((matrixDados[j][0], matrixDados[j][1], matrixDados[j][2], matrixDados[j][3], matrixDados[j][4],
                   matrixDados[j][5], matrixDados[j][6], matrixDados[j][7], matrixDados[j][8]),
                  matrixCriseBanc[j])
 
-#nn = buildNetwork(9, 3, 1, bias=True)
-nn = buildNetwork(9, 1)
+# cria a arquitetura da rede neural
+nn = buildNetwork(9, 20, 20, 1, hiddenclass=SigmoidLayer, bias=True)
+
+# nn = buildNetwork(9, 1)
 
 trainer = BackpropTrainer(nn, ds)
 
-for i in range(20):
-    print trainer.train()
+import time
+inicio = time.time()
+######## aqui se define o numero de treinos que serao executados ########################
+for i in range(100):
+    erro = trainer.train()
+    print erro
+    # print trainer.train()
+fim = time.time()
+print ('O treino demorou:', fim-inicio)
+########################################################
+matrixActivations = [[0] for i in range(52)]
 
+for i in range(52):
+    matrixActivations[i] = nn.activate([matrixTesteInput[i][0], matrixTesteInput[i][1], matrixTesteInput[i][2],
+                                        matrixTesteInput[i][3], matrixTesteInput[i][4], matrixTesteInput[i][5],
+                                        matrixTesteInput[i][6], matrixTesteInput[i][7], matrixTesteInput[i][8]])
 
-a = nn.activate([0, 0.1021841633, 0, 0, 0, 0.000000205641777, 1, 0, 0])
-b = nn.activate([0, 0.1049333009, 0, 0, 0, 0.0000004054626456, 1, 0, 0])
-c = nn.activate([0, 0.1049953739, 0, 0, 0, 0.0000001480238797, 1, 0, 0])
-d = nn.activate([0, 0.1181915528, 0, 0, 0, 0.0000001326530437, 1, 0, 0])
-e = nn.activate([0, 0.128001094, 0, 0, 0, 0.0000006131963115, 1, 0, 0])
-f = nn.activate([0, 0.1287452571, 0, 0, 0, 0.0000004677190792, 1, 0, 0])
-g = nn.activate([0, 0.1310750979, 0, 0, 0, 0.0000003993688822, 1, 0, 0])
-h = nn.activate([0, 0.1363551833, 0, 0, 0, 0.0000003317917746, 1, 0, 0])
-i = nn.activate([0, 0.6811190973, 0, 1, 0, 0.00000005434363633, 1, 0, 0])
-j = nn.activate([0, 0.667955131, 0, 1, 0, 0.0000002671251212, 1, 0, 0])
-k = nn.activate([0, 0.6390399535, 0, 1, 0, 0.000000297957745, 1, 0, 0])
-l = nn.activate([0, 0.7258874886, 0, 1, 0, 0.0000005267922035, 1, 0, 0])
-m = nn.activate([0, 0, 0, 1, 0, 0.0000002022765643, 1, 0, 0])
-n = nn.activate([0, 0, 0, 1, 0, 1.3, 1, 0, 0])
-o = nn.activate([0, 0, 0, 0, 0, 0.0000001175095868, 1, 0, 0])
+acertos = 0
+for i in range(52):
+    # print 'Previsao de crise bancaria na linha', i, 'foi:', matrixActivations[i],'||| Sendo que o resultado esperado era:', matrixTesteOutput[i]
+    diferenca = abs(matrixTesteOutput[i] - matrixActivations[i])
+    print diferenca, '||', erro
+    if diferenca < erro:
+        acertos += 1
+print 'O numero de acertos foi de:', (float(acertos)/52)*100,'%'
 
-print('Previsao de crise bancaria:', a,'Resultado esperado:0')
-print('Previsao de crise bancaria:', b,'Resultado esperado:0')
-print('Previsao de crise bancaria:', c,'Resultado esperado:0')
-print('Previsao de crise bancaria:', d,'Resultado esperado:0')
-print('Previsao de crise bancaria:', e,'Resultado esperado:0')
-print('Previsao de crise bancaria:', f,'Resultado esperado:0')
-print('Previsao de crise bancaria:', g,'Resultado esperado:0')
-print('Previsao de crise bancaria:', h,'Resultado esperado:0')
-print('Previsao de crise bancaria:', i,'Resultado esperado:0')
-print('Previsao de crise bancaria:', j,'Resultado esperado:0')
-print('Previsao de crise bancaria:', k,'Resultado esperado:0')
-print('Previsao de crise bancaria:', l,'Resultado esperado:0')
-print('Previsao de crise bancaria:', m,'Resultado esperado:0')
-print('Previsao de crise bancaria:', n,'Resultado esperado:0')
-print('Previsao de crise bancaria:', o,'Resultado esperado:0')
