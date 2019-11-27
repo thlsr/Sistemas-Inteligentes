@@ -1,4 +1,5 @@
-# Neural Network
-Project done for the Intelligent Systems subject in which we work on a Banking Crisis dataset using a Neural Network.
+# Artificial Intelligence
+Project done for the Intelligent Systems subject in which we work on a dataset of African countries in which we made a model that predicts if a given African country is going to have a banking crisis.
 
-It is used the Pybrain package that has Numpy, Scipy and Pip packages as prerequisites.
+The neuralNetwork1.py file was made using the Pybrain package.
+The neuralNetwork2.py and decisionTree.py files were made based on the Scikit-Learn package that has proven to be a lot more effective in terms of efficency and quality of results.
