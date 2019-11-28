@@ -25,8 +25,6 @@ trainCrisis = train[:,9]
 testFeatures = test[:, 0:9]
 testCrisis = test[:,9]
 
-
-
 # REDE NEURAL
 
 # Cria a arquitetura da rede neural

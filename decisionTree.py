@@ -48,11 +48,11 @@ predict = tree.predict(testFeatures)
 # print(predict)
 
 acertos = 0
-for i in range(52):
+for i in range(len(testCrisis)):
   if(testCrisis[i] == predict[i]):
     acertos +=1
 
-print("Acertos: %f%%" % (float(acertos/52)*100))
+print("Acertos: %f%%" % (float(acertos/len(testCrisis))*100))
 
 # Serve apenas para exportar a estrutura da arvore em formato de imagem
 dot_data = export_graphviz(
@@ -73,11 +73,11 @@ graph.write_png('classifier.png')
 # print(pred)
 
 # acertos = 0
-# for i in range(52):
-#   if(testCrisis[i] == pred[i]):
+# for i in range(len(testCrisis)):
+#   if(testCrisis[i] == predict[i]):
 #     acertos +=1
 
-# print("Acertos: %f" % (float(acertos/52)*100))
+# print("Acertos: %f%%" % (float(acertos/len(testCrisis))*100))
 
 # dot_data = export_graphviz(regressor, out_file='tree.dot', 
 #                 feature_names=['criseSist','cambioDolar','dividaPublInt','dividaPubExt','dividaPib',
