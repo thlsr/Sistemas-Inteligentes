@@ -52,7 +52,7 @@ for i in range(52):
   if(testCrisis[i] == predict[i]):
     acertos +=1
 
-print("Acertos: %f" % (float(acertos/52)*100))
+print("Acertos: %f%%" % (float(acertos/52)*100))
 
 # Serve apenas para exportar a estrutura da arvore em formato de imagem
 dot_data = export_graphviz(
